@@ -20,11 +20,9 @@ menu_background_path = os.path.join(os.path.dirname(__file__), '..', 'assets', '
 menu_background = pygame.image.load(menu_background_path).convert()
 menu_background = pygame.transform.scale(menu_background, (1200, 750))
 
-footstep_sound_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'footstep.wav')
 jump_sound_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'jump.wav')
 background_music_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'background_music.mp3')
 
-footstep_sound = pygame.mixer.Sound(footstep_sound_path)
 jump_sound = pygame.mixer.Sound(jump_sound_path)
 
 pygame.mixer.music.load(background_music_path)
@@ -32,7 +30,7 @@ background_music_volume = 0.2
 pygame.mixer.music.set_volume(background_music_volume)
 pygame.mixer.music.play(-1)
 
-player = Player((100, 300), footstep_sound, jump_sound)
+player = Player((100, 300), jump_sound)
 all_sprites = pygame.sprite.Group(player)
 obstacles = pygame.sprite.Group()
 tower = Tower((900, 290))
@@ -51,14 +49,13 @@ def spawn_obstacle():
         obstacle = Obstacle((1200, 500))
         all_sprites.add(obstacle)
         obstacles.add(obstacle)
-        print("Obstacle spawned")
 
 def reset_game():
     global player, all_sprites, obstacles, tower, tower_group, torch, torch_group
     global menu_mode, game_over, running, loose_screen, win_screen
     global obstacles_crossed, torch_collected, background_x, show_message
 
-    player = Player((100, 300), footstep_sound, jump_sound)
+    player = Player((100, 300), jump_sound)
     all_sprites = pygame.sprite.Group(player)
     obstacles = pygame.sprite.Group()
     tower = Tower((900, 290))
@@ -131,6 +128,15 @@ while running:
         elif event.type == pygame.USEREVENT and not game_over and not win_screen and not loose_screen:
             spawn_obstacle()
 
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_PLUS] or keys[pygame.K_EQUALS]:
+        background_music_volume = min(background_music_volume + 0.1, 1.0)
+        pygame.mixer.music.set_volume(background_music_volume)
+    elif keys[pygame.K_MINUS]:
+        background_music_volume = max(background_music_volume - 0.1, 0.0)
+        pygame.mixer.music.set_volume(background_music_volume)
+
     if menu_mode:
         screen.blit(menu_background, (0, 0))
         play_button_rect = pygame.Rect(400, 200, 400, 100)
@@ -140,8 +146,6 @@ while running:
     elif loose_screen:
         restart_button_rect = show_loose_screen()
     else:
-        keys = pygame.key.get_pressed()
-
         if not game_over:
             player.update(keys)
             obstacles.update()
@@ -157,7 +161,6 @@ while running:
                         obstacles_crossed += 1
                         obstacle.passed_by_player = True
                         obstacle.kill()
-                        print(f"Obstacle removed, total obstacles crossed: {obstacles_crossed}")
 
             if obstacles_crossed >= target_obstacles and torch not in torch_group:
                 for obstacle in obstacles:
@@ -165,7 +168,6 @@ while running:
                 tower_group.add(tower)
                 torch_group.add(torch)
                 obstacles.empty()
-                print("Tower and torch added")
 
             if not torch_collected and pygame.sprite.spritecollide(player, torch_group, True):
                 torch_collected = True
@@ -203,10 +205,10 @@ while running:
         screen.blit(background, (background_x + 1200, 0))
 
         all_sprites.draw(screen)
+        tower_group.draw(screen)
+        torch_group.draw(screen)
 
-        if obstacles_crossed >= target_obstacles:
-            tower_group.draw(screen)
-            torch_group.draw(screen)
+        player.draw(screen)
 
         score_text = small_font.render(f'Score: {obstacles_crossed}', True, (255, 255, 255))
         screen.blit(score_text, (10, 10))
@@ -221,4 +223,3 @@ while running:
     clock.tick(30)
 
 pygame.quit()
-
