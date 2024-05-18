@@ -22,8 +22,8 @@ class Player(pygame.sprite.Sprite):
             self.jump()
 
         self.rect.y += self.velocity_y
-        if self.rect.bottom >= 550:
-            self.rect.bottom = 550
+        if self.rect.bottom >= 580:
+            self.rect.bottom = 580
             self.on_ground = True
             self.velocity_y = 0
             self.is_jumping = False
