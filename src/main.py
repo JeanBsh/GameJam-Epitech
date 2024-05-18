@@ -20,7 +20,13 @@ menu_background_path = os.path.join(os.path.dirname(__file__), '..', 'assets', '
 menu_background = pygame.image.load(menu_background_path).convert()
 menu_background = pygame.transform.scale(menu_background, (1200, 750))
 
-player = Player((100, 300))
+# Charger les fichiers audio
+footstep_sound_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'footstep.wav')
+jump_sound_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'jump.wav')
+footstep_sound = pygame.mixer.Sound(footstep_sound_path)
+jump_sound = pygame.mixer.Sound(jump_sound_path)
+
+player = Player((100, 300), footstep_sound, jump_sound)
 all_sprites = pygame.sprite.Group(player)
 obstacles = pygame.sprite.Group()
 tower = Tower((900, 290))
@@ -46,7 +52,7 @@ def reset_game():
     global menu_mode, game_over, running, loose_screen, win_screen
     global obstacles_crossed, torch_collected, background_x, show_message
 
-    player = Player((100, 300))
+    player = Player((100, 300), footstep_sound, jump_sound)
     all_sprites = pygame.sprite.Group(player)
     obstacles = pygame.sprite.Group()
     tower = Tower((900, 290))
@@ -96,6 +102,13 @@ def draw_text(text, font, color, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
+def draw_button(text, rect, color, shadow_color, text_color):
+    shadow_rect = pygame.Rect(rect.x + 5, rect.y + 5, rect.width, rect.height)
+    pygame.draw.rect(screen, shadow_color, shadow_rect, border_radius=10)
+    pygame.draw.rect(screen, color, rect, border_radius=10)
+    button_text = font.render(text, True, text_color)
+    screen.blit(button_text, (rect.centerx - button_text.get_width() // 2, rect.centery - button_text.get_height() // 2))
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -116,14 +129,8 @@ while running:
         screen.blit(menu_background, (0, 0))
         play_button_rect = pygame.Rect(400, 200, 400, 100)
         help_button_rect = pygame.Rect(400, 350, 400, 100)
-        pygame.draw.rect(screen, (0, 255, 0), play_button_rect)
-        pygame.draw.rect(screen, (0, 0, 255), help_button_rect)
-        play_text = font.render("Play", True, (255, 255, 255))
-        help_text = font.render("Help", True, (255, 255, 255))
-        screen.blit(play_text, (play_button_rect.centerx - play_text.get_width() // 2,
-                                 play_button_rect.centery - play_text.get_height() // 2))
-        screen.blit(help_text, (help_button_rect.centerx - help_text.get_width() // 2,
-                                 help_button_rect.centery - help_text.get_height() // 2))
+        draw_button("Play", play_button_rect, (0, 255, 0), (0, 200, 0), (255, 255, 255))
+        draw_button("Help", help_button_rect, (0, 0, 255), (0, 0, 200), (255, 255, 255))
     elif loose_screen:
         restart_button_rect = show_loose_screen()
     else:
