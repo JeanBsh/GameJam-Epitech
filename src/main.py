@@ -64,66 +64,64 @@ while running:
     keys = pygame.key.get_pressed()
 
     if not game_over:
-        if not win_screen:
-            player.update(keys)
-            obstacles.update()
+        player.update(keys)
+        obstacles.update()
+        torch_group.update()
 
-            if pygame.sprite.spritecollide(player, obstacles, False):
-                print("Game Over")
-                game_over = True
-                running = False
+        if pygame.sprite.spritecollide(player, obstacles, False):
+            print("Game Over")
+            game_over = True
+            running = False
 
-            for obstacle in obstacles:
-                if obstacle.rect.right < player.rect.left and not obstacle.passed_by_player:
-                    if player.rect.bottom >= 450 and player.rect.top < 450:
-                        obstacles_crossed += 1
-                        obstacle.passed_by_player = True
-                        obstacle.kill()
-                        print(f"Obstacle removed, total obstacles crossed: {obstacles_crossed}")
-
-            if obstacles_crossed >= target_obstacles and torch not in torch_group:
-                win_screen = True
-                for obstacle in obstacles:
+        for obstacle in obstacles:
+            if obstacle.rect.right < player.rect.left and not obstacle.passed_by_player:
+                if player.rect.bottom >= 450 and player.rect.top < 450:
+                    obstacles_crossed += 1
+                    obstacle.passed_by_player = True
                     obstacle.kill()
-                tower_group.add(tower)
-                torch_group.add(torch)
-                obstacles.empty()
+                    print(f"Obstacle removed, total obstacles crossed: {obstacles_crossed}")
 
-            if pygame.sprite.spritecollide(player, torch_group, True):
-                torch_collected = True
-                show_message = True
-                print("Torche ramassée!")
-                player.image = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'images', 'player_with_torch.png')).convert_alpha()
-                player.image = pygame.transform.scale(player.image, (100, 100))
-                torch.rect.topleft = player.rect.topleft
+        if obstacles_crossed >= target_obstacles and torch not in torch_group:
+            for obstacle in obstacles:
+                obstacle.kill()
+            tower_group.add(tower)
+            torch_group.add(torch)
+            obstacles.empty()
+            print("Tower and torch added")
 
-        else:
-            if keys[pygame.K_LEFT]:
-                player.rect.x -= 5
-                background_x += 5
-            if keys[pygame.K_RIGHT]:
-                player.rect.x += 5
-                background_x -= 5
-            if keys[pygame.K_UP]:
-                player.rect.y -= 5
-                background_x += 5
-            if keys[pygame.K_DOWN]:
-                player.rect.y += 5
-                background_x -= 5
+        if pygame.sprite.spritecollide(player, torch_group, True):
+            torch_collected = True
+            show_message = True
+            print("Torche ramassée!")
+            torch.rect.center = player.rect.center
 
-            if torch_collected and pygame.sprite.spritecollide(player, tower_group, False):
-                torch_collected = False
-                torch.rect.topleft = (tower.rect.centerx - 25, tower.rect.top - 50)
-                torch_group.add(torch)
-                player.image = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'images', 'player_jul.png')).convert_alpha()
-                player.image = pygame.transform.scale(player.image, (100, 100))
-                show_win_screen()
-                running = False
+        if torch_collected:
+            torch.rect.centerx = player.rect.centerx
+            torch.rect.top = player.rect.top - torch.rect.height
 
-    if not win_screen or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_UP] or keys[pygame.K_DOWN]:
+        if torch_collected and pygame.sprite.spritecollide(player, tower_group, False):
+            torch_collected = False
+            torch.rect.topleft = (tower.rect.centerx - 25, tower.rect.top - 50)
+            torch_group.add(torch)
+            show_win_screen()
+            running = False
+
+    if keys[pygame.K_LEFT]:
+        player.rect.x -= 5
+        background_x += 5
+    if keys[pygame.K_RIGHT]:
+        player.rect.x += 5
         background_x -= 5
-        if background_x <= -1200:
-            background_x = 0
+    if keys[pygame.K_UP]:
+        player.rect.y -= 5
+        background_x += 5
+    if keys[pygame.K_DOWN]:
+        player.rect.y += 5
+        background_x -= 5
+
+    background_x -= 5
+    if background_x <= -1200:
+        background_x = 0
     screen.blit(background, (background_x, 0))
     screen.blit(background, (background_x + 1200, 0))
 
@@ -131,10 +129,9 @@ while running:
     tower_group.draw(screen)
 
     if torch_collected:
-        torch.rect.topleft = player.rect.topleft
+        torch.rect.centerx = player.rect.centerx
+        torch.rect.top = player.rect.top - torch.rect.height
         torch_group.add(torch)
-    else:
-        torch_group.update()
     torch_group.draw(screen)
 
     score_text = small_font.render(f'Score: {obstacles_crossed}', True, (255, 255, 255))
@@ -150,4 +147,3 @@ while running:
     clock.tick(30)
 
 pygame.quit()
-
