@@ -115,6 +115,10 @@ def draw_button(text, rect, color, shadow_color, text_color):
     button_text = font.render(text, True, text_color)
     screen.blit(button_text, (rect.centerx - button_text.get_width() // 2, rect.centery - button_text.get_height() // 2))
 
+def draw_jul_text(surface, font, color, player):
+    text = font.render("JUL", True, color)
+    surface.blit(text, (player.rect.centerx - text.get_width() + 120 // 2, player.rect.top - text.get_height()))
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -216,6 +220,10 @@ while running:
             pygame.display.flip()
             pygame.time.wait(2000)
             show_message = False
+
+    # Dessine "JUL" au-dessus de la tête de Jul
+    if not menu_mode and not game_over and not win_screen and not loose_screen:
+        draw_jul_text(screen, small_font, (255, 255, 255), player)
 
     pygame.display.flip()
     clock.tick(30)
