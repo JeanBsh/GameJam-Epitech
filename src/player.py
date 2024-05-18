@@ -46,9 +46,3 @@ class Player(pygame.sprite.Sprite):
             self.velocity_y += 1
 
         self.full_rect.center = self.rect.center
-
-    def draw(self, surface):
-        surface.blit(self.image, self.full_rect)
-        name_surface = pygame.font.Font(None, 36).render("JUL", True, (255, 255, 255))
-        name_rect = name_surface.get_rect(center=(self.full_rect.centerx, self.full_rect.top - 10))
-        surface.blit(name_surface, name_rect)

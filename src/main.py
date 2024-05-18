@@ -20,9 +20,11 @@ menu_background_path = os.path.join(os.path.dirname(__file__), '..', 'assets', '
 menu_background = pygame.image.load(menu_background_path).convert()
 menu_background = pygame.transform.scale(menu_background, (1200, 750))
 
+footstep_sound_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'footstep.wav')
 jump_sound_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'jump.wav')
 background_music_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'background_music.mp3')
 
+footstep_sound = pygame.mixer.Sound(footstep_sound_path)
 jump_sound = pygame.mixer.Sound(jump_sound_path)
 
 pygame.mixer.music.load(background_music_path)
@@ -132,15 +134,6 @@ while running:
         elif event.type == pygame.USEREVENT and not game_over and not win_screen and not loose_screen:
             spawn_obstacle()
 
-    keys = pygame.key.get_pressed()
-
-    if keys[pygame.K_PLUS] or keys[pygame.K_EQUALS]:
-        background_music_volume = min(background_music_volume + 0.1, 1.0)
-        pygame.mixer.music.set_volume(background_music_volume)
-    elif keys[pygame.K_MINUS]:
-        background_music_volume = max(background_music_volume - 0.1, 0.0)
-        pygame.mixer.music.set_volume(background_music_volume)
-
     if menu_mode:
         screen.blit(menu_background, (0, 0))
         play_button_rect = pygame.Rect(400, 200, 400, 100)
@@ -150,6 +143,8 @@ while running:
     elif loose_screen:
         restart_button_rect = show_loose_screen()
     else:
+        keys = pygame.key.get_pressed()
+
         if not game_over:
             player.update(keys)
             obstacles.update()
@@ -176,7 +171,6 @@ while running:
             if not torch_collected and pygame.sprite.spritecollide(player, torch_group, True):
                 torch_collected = True
                 show_message = True
-                print("Torche ramassée!")
                 torch.rect.center = player.rect.center
 
             if torch_collected:
@@ -209,10 +203,10 @@ while running:
         screen.blit(background, (background_x + 1200, 0))
 
         all_sprites.draw(screen)
-        tower_group.draw(screen)
-        torch_group.draw(screen)
 
-        player.draw(screen)
+        if obstacles_crossed >= target_obstacles:
+            tower_group.draw(screen)
+            torch_group.draw(screen)
 
         score_text = small_font.render(f'Score: {obstacles_crossed}', True, (255, 255, 255))
         screen.blit(score_text, (10, 10))
@@ -223,7 +217,6 @@ while running:
             pygame.time.wait(2000)
             show_message = False
 
-    # Dessine "JUL" au-dessus de la tête de Jul
     if not menu_mode and not game_over and not win_screen and not loose_screen:
         draw_jul_text(screen, small_font, (255, 255, 255), player)
 
@@ -231,3 +224,4 @@ while running:
     clock.tick(30)
 
 pygame.quit()
+
