@@ -2,7 +2,7 @@ import pygame
 import os
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, position, footstep_sound, jump_sound):
+    def __init__(self, position, jump_sound):
         super().__init__()
         self.image = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'images', 'player_jul.png')).convert_alpha()
         self.image = pygame.transform.scale(self.image, (150, 160))
@@ -23,7 +23,6 @@ class Player(pygame.sprite.Sprite):
         self.on_ground = True
         self.is_jumping = False
 
-        self.footstep_sound = footstep_sound
         self.jump_sound = jump_sound
 
     def jump(self):
@@ -36,10 +35,6 @@ class Player(pygame.sprite.Sprite):
     def update(self, keys):
         if keys[pygame.K_SPACE] and self.on_ground:
             self.jump()
-
-        if keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]:
-            if self.on_ground:
-                self.footstep_sound.play()
 
         self.rect.y += self.velocity_y
         if self.rect.bottom >= 535:
@@ -55,5 +50,5 @@ class Player(pygame.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, self.full_rect)
         name_surface = pygame.font.Font(None, 36).render("JUL", True, (255, 255, 255))
-        name_rect = name_surface.get_rect(center=(self.rect.centerx, self.rect.top - 10))
+        name_rect = name_surface.get_rect(center=(self.full_rect.centerx, self.full_rect.top - 10))
         surface.blit(name_surface, name_rect)
