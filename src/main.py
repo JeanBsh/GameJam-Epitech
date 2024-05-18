@@ -83,6 +83,8 @@ while running:
 
             if obstacles_crossed >= target_obstacles and torch not in torch_group:
                 win_screen = True
+                for obstacle in obstacles:
+                    obstacle.kill()
                 tower_group.add(tower)
                 torch_group.add(torch)
                 obstacles.empty()
@@ -93,6 +95,7 @@ while running:
                 print("Torche ramassée!")
                 player.image = pygame.image.load(os.path.join(os.path.dirname(__file__), '..', 'assets', 'images', 'player_with_torch.png')).convert_alpha()
                 player.image = pygame.transform.scale(player.image, (100, 100))
+                torch.rect.topleft = player.rect.topleft
 
         else:
             if keys[pygame.K_LEFT]:
@@ -128,8 +131,7 @@ while running:
     tower_group.draw(screen)
 
     if torch_collected:
-        torch.rect.centerx = player.rect.centerx
-        torch.rect.top = player.rect.top - torch.rect.height
+        torch.rect.topleft = player.rect.topleft
         torch_group.add(torch)
     else:
         torch_group.update()
@@ -148,3 +150,4 @@ while running:
     clock.tick(30)
 
 pygame.quit()
+
