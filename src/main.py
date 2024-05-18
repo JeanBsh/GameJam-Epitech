@@ -218,6 +218,7 @@ while running:
             show_message = False
 
     if not menu_mode and not game_over and not win_screen and not loose_screen:
+        torch_group.update()
         draw_jul_text(screen, small_font, (255, 255, 255), player)
 
     pygame.display.flip()
