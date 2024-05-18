@@ -145,7 +145,6 @@ while running:
         if not game_over:
             player.update(keys)
             obstacles.update()
-            torch_group.update()
 
             if pygame.sprite.spritecollide(player, obstacles, False):
                 print("Game Over")
@@ -168,15 +167,15 @@ while running:
                 obstacles.empty()
                 print("Tower and torch added")
 
-            if pygame.sprite.spritecollide(player, torch_group, True):
+            if not torch_collected and pygame.sprite.spritecollide(player, torch_group, True):
                 torch_collected = True
                 show_message = True
                 print("Torche ramassée!")
                 torch.rect.center = player.rect.center
 
             if torch_collected:
-                torch.rect.centerx = player.rect.centerx
-                torch.rect.top = player.rect.top - torch.rect.height
+                torch.rect.centerx = player.rect.centerx + 25
+                torch.rect.centery = player.rect.centery - 25
 
             if torch_collected and pygame.sprite.spritecollide(player, tower_group, False):
                 torch_collected = False
@@ -204,13 +203,10 @@ while running:
         screen.blit(background, (background_x + 1200, 0))
 
         all_sprites.draw(screen)
-        tower_group.draw(screen)
 
-        if torch_collected:
-            torch.rect.centerx = player.rect.centerx
-            torch.rect.top = player.rect.top - torch.rect.height
-            torch_group.add(torch)
-        torch_group.draw(screen)
+        if obstacles_crossed >= target_obstacles:
+            tower_group.draw(screen)
+            torch_group.draw(screen)
 
         score_text = small_font.render(f'Score: {obstacles_crossed}', True, (255, 255, 255))
         screen.blit(score_text, (10, 10))
