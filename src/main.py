@@ -20,11 +20,17 @@ menu_background_path = os.path.join(os.path.dirname(__file__), '..', 'assets', '
 menu_background = pygame.image.load(menu_background_path).convert()
 menu_background = pygame.transform.scale(menu_background, (1200, 750))
 
-# Charger les fichiers audio
 footstep_sound_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'footstep.wav')
 jump_sound_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'jump.wav')
+background_music_path = os.path.join(os.path.dirname(__file__), '..', 'assets', 'sounds', 'background_music.mp3')
+
 footstep_sound = pygame.mixer.Sound(footstep_sound_path)
 jump_sound = pygame.mixer.Sound(jump_sound_path)
+
+pygame.mixer.music.load(background_music_path)
+background_music_volume = 0.2
+pygame.mixer.music.set_volume(background_music_volume)
+pygame.mixer.music.play(-1)
 
 player = Player((100, 300), footstep_sound, jump_sound)
 all_sprites = pygame.sprite.Group(player)
@@ -219,3 +225,4 @@ while running:
     clock.tick(30)
 
 pygame.quit()
+
