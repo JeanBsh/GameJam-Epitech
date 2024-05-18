@@ -3,6 +3,7 @@ import os
 import pygame
 from src.player import Player
 from src.obstacle import Obstacle
+from src.tower import Tower  # Importez la classe Tower
 
 pygame.init()
 screen = pygame.display.set_mode((1200, 600))
@@ -22,6 +23,10 @@ def spawn_obstacle():
         all_sprites.add(obstacle)
         obstacles.add(obstacle)
         print("Obstacle spawned")
+
+def spawn_tower():
+    tower = Tower((800, 200))
+    all_sprites.add(tower)
 
 pygame.time.set_timer(pygame.USEREVENT, 2000)
 
@@ -67,8 +72,11 @@ while running:
                         print(f"Obstacle removed, total obstacles crossed: {obstacles_crossed}")
 
             if obstacles_crossed >= target_obstacles:
+                for obstacle in obstacles:
+                    obstacle.kill()
                 win_screen = show_win_screen()
                 obstacles.empty()
+                spawn_tower()
 
         else:
             if keys[pygame.K_LEFT]:
